@@ -1,0 +1,76 @@
+﻿@{
+    var title = "";
+    var action = (string)ViewData["action"];
+    var arr = new string[] { };
+    switch (action.ToLower())
+    {
+        case "termsofservice":
+            {
+                title = "이용약관";
+                arr = new string[] { "20180712" };
+                break;
+            }
+        case "privacypolicy":
+            {
+                title = "개인정보처리방침";
+                arr = new string[] { "20180712" };
+                break;
+            }
+    }
+    ViewData["Title"] = "루니아 원정대 " + title;
+
+    var date = (string)ViewData["date"];
+    var language = (string)ViewData["language"];
+
+    var dates = arr
+.Select(g => new SelectListItem { Value = g.ToString(), Text = Util.Convert(g.ToString()) }).ToList();
+
+    if (dates.Count > 0)
+    {
+        date = dates.Count > 0 && dates.Select(a => a.Value).Contains(date) ? date : dates[0].Value;
+    }
+    else
+    {
+        date = string.Empty;
+    }
+}
+<header>
+    <h1></h1>
+</header>
+
+<div class="wrap">
+    <div class="dropdown">
+        <div class="ui policy">
+            <label class="active">@title</label>
+            <ul>
+                <li data-value="TermsOfService">이용약관</li>
+                <li data-value="PrivacyPolicy">개인정보처리방침</li>
+            </ul>
+            <select id="policy">
+                <option value="TermsOfService">이용약관</option>
+                <option value="PrivacyPolicy">개인정보처리방침</option>
+            </select>
+            <script type="text/javascript">
+                document.getElementById('policy').value = '@action';
+            </script>
+        </div>
+        <div class="ui date">
+            <label class="active">@Util.Convert(date)</label>
+            <ul>
+                @foreach (var item in dates)
+                {
+                    <li data-value="@item.Value">@item.Text</li>
+                }
+            </ul>
+            <select asp-for="@date" asp-items="dates" id="date"></select>
+        </div>
+    </div>
+
+    @{ await Html.RenderPartialAsync(string.Format("{0}/{1}/{2}", language, action, date)); }
+</div>
+
+@section scripts {
+    <script type="text/javascript">
+        action = '@action';
+    </script>
+}
